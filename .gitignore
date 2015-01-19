@@ -55,3 +55,6 @@ target/
 
 # IDE's temp folder
 .idea/
+
+# Other files
+MANIFEST

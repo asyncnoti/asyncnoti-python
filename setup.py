@@ -13,7 +13,7 @@ setup(
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
-        "Development Status :: 1 - Alpha",
+        "Development Status :: 1 - Planning",
         "Intended Audience :: Developers",
         "Topic :: Internet :: WWW/HTTP",
     ],
