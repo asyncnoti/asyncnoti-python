@@ -1,7 +1,7 @@
 import unittest
 import mock
 from nose.tools import *
-from .asyncnoti import Asyncnoti
+from asyncnoti import Asyncnoti
 
 
 class PropertiesTest(unittest.TestCase):
@@ -16,7 +16,7 @@ class PropertiesTest(unittest.TestCase):
 
 
 class RequestTest(unittest.TestCase):
-    @mock.patch('asyncnoti.client.Asyncnoti._request')
+    @mock.patch('asyncnoti.Asyncnoti._request')
     def test_trigger_method(self, _request):
         _request.return_value = 200, {}
         obj().trigger('channel1', 'event1')
@@ -24,7 +24,7 @@ class RequestTest(unittest.TestCase):
 
 
     @mock.patch('time.time')
-    @mock.patch('asyncnoti.client.Asyncnoti._http_request')
+    @mock.patch('asyncnoti.Asyncnoti._http_request')
     def test_request_method(self, http_request_mock, time_mock):
         time_mock.return_value = 1421420862
         http_request_mock.return_value = 200, {}
