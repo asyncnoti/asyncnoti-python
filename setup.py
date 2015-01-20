@@ -19,6 +19,6 @@ setup(
     ],
     license='MIT',
     install_requires=['six'],
-    tests_require=['nose', 'mock'],
+    tests_require=['nose', 'mock', 'coverage'],
     test_suite='asyncnoti_tests',
 )

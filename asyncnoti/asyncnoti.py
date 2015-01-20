@@ -7,6 +7,7 @@ import six
 import time
 import sys
 from six.moves import http_client
+from .util import AsyncnotiException
 
 
 def _make_query_string(params):
@@ -36,9 +37,9 @@ class Asyncnoti(object):
             raise TypeError("App ID should be %s" % six.text_type)
 
         if not isinstance(host, six.text_type):
-            raise TypeError("host should be %s" % host)
+            raise TypeError("Host should be %s" % host)
 
-        if port and not isinstance(port, six.integer_types):
+        if not isinstance(port, six.integer_types):
             raise TypeError("Port should be a number")
 
         # if not isinstance(timeout, six.integer_types):
@@ -51,10 +52,23 @@ class Asyncnoti(object):
         self.port = port
         self.timeout = timeout
 
-    def trigger(self, channels, event_name, data=None, **kwargs):
+    def trigger(self, channels, event_name, data=None):
         if not data: data = {}
         if type(channels) not in [list, tuple]:
             channels = (channels,)
+
+        if not isinstance(event_name, six.text_type):
+            raise TypeError("event_name must be %s" % six.text_type)
+
+        if len(event_name) > 255:
+            raise ValueError("event_name too long")
+
+        for channel in channels:
+            if not isinstance(channel, six.text_type):
+                raise TypeError("Channel should be %s" % six.text_type)
+
+            if len(channel) > 255:
+                raise ValueError("Channel too long")
 
         data_json = json.dumps(data)
 
@@ -63,13 +77,10 @@ class Asyncnoti(object):
                                           'data_hash': hashlib.sha256(data_json.encode('utf8')).hexdigest(),
                                           'name': event_name,
                                           'channels': channels,
-                                          })
-        if not (200 <= status <= 299):
-            raise Exception({
-                'error_code': status,
-                'error_msg': "HTTP error",
-                'request_params': kwargs,
-            })
+                                         })
+
+        if status >= 300 or status < 200:
+            raise AsyncnotiException('Asyncnoti HTTP error %i', status)
 
         return response
 
@@ -106,7 +117,7 @@ class Asyncnoti(object):
             resp = self.http.getresponse()
             body = resp.read().decode('utf8')
         except http_client.HTTPException as e:
-            raise Exception(repr(e))
+            raise Exception('HTTP client exception: %s' % repr(e))
 
         return resp.status, body
 
