@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
     name='asyncnoti',
     packages=['asyncnoti'],
-    version='1.0.4',
+    version='1.0.5',
     description='Library to interact with the Asyncnoti API',
     url='https://github.com/asyncnoti/asyncnoti-python',
     download_url = 'https://github.com/asyncnoti/asyncnoti-python/tarball/1.0.4',

@@ -72,17 +72,12 @@ class Asyncnoti(object):
 
         data_json = json.dumps(data)
 
-        status, response = self._request('/api/v1/apps/%s/events' % self.app_id, 'POST',
-                                         {'data': data_json,
-                                          'data_hash': hashlib.sha256(data_json.encode('utf8')).hexdigest(),
-                                          'name': event_name,
-                                          'channels': channels,
-                                         })
-
-        if status >= 300 or status < 200:
-            raise AsyncnotiException('Asyncnoti HTTP error %i', status)
-
-        return response
+        return self._request('/api/v1/apps/%s/events' % self.app_id, 'POST',
+                             {'data': data_json,
+                              'data_hash': hashlib.sha256(data_json.encode('utf8')).hexdigest(),
+                              'name': event_name,
+                              'channels': channels,
+                             })
 
     def _request(self, uri, method, params=None):
         params['auth_timestamp'] = '%.0f' % time.time()
@@ -97,7 +92,12 @@ class Asyncnoti(object):
         params['auth_signature'] = six.text_type(
             hmac.new(self.app_secret.encode('utf8'), string_to_sign.encode('utf8'), hashlib.sha256).hexdigest())
 
-        return self._http_request(method, uri, params)
+        status, raw_response = self._http_request(method, uri, params)
+
+        if status >= 300 or status < 200:
+            raise AsyncnotiException('Asyncnoti HTTP error %i' % status, status)
+
+        return json.loads(raw_response)
 
     def _http_request(self, method, uri, request_params):
         if self.host.find('https') == 0:
@@ -115,11 +115,11 @@ class Asyncnoti(object):
         try:
             self.http.request(method, uri, request_body, headers)
             resp = self.http.getresponse()
-            body = resp.read().decode('utf8')
+            raw_response = resp.read().decode('utf8')
         except http_client.HTTPException as e:
             raise Exception('HTTP client exception: %s' % repr(e))
 
-        return resp.status, body
+        return resp.status, raw_response
 
 
 
