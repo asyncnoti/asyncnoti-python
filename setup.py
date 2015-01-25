@@ -3,10 +3,10 @@ from distutils.core import setup
 setup(
     name='asyncnoti',
     packages=['asyncnoti'],
-    version='1.0.5',
+    version='1.0.6',
     description='Library to interact with the Asyncnoti API',
     url='https://github.com/asyncnoti/asyncnoti-python',
-    download_url = 'https://github.com/asyncnoti/asyncnoti-python/tarball/1.0.4',
+    download_url = 'https://github.com/asyncnoti/asyncnoti-python/tarball/1.0.6',
     author='Asyncnoti',
     author_email='admin@asyncnoti.com',
     keywords=['asyncnoti', 'websockets', 'realtime'],

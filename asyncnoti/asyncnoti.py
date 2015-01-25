@@ -7,6 +7,7 @@ import six
 import time
 import sys
 from six.moves import http_client
+from six.moves.urllib.parse import urlparse
 from .util import AsyncnotiException
 
 
@@ -25,7 +26,7 @@ def _make_query_string(params):
 
 
 class Asyncnoti(object):
-    def __init__(self, app_key=None, app_secret=None, app_id=None, host=u'http://asyncnoti.com', port=80,
+    def __init__(self, app_key=None, app_secret=None, app_id=None, host=u'http://asyncnoti.com', port=None,
                  timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
         if not isinstance(app_key, six.text_type):
             raise TypeError("Key should be %s" % six.text_type)
@@ -39,17 +40,20 @@ class Asyncnoti(object):
         if not isinstance(host, six.text_type):
             raise TypeError("Host should be %s" % host)
 
-        if not isinstance(port, six.integer_types):
+        if port and not isinstance(port, six.integer_types):
             raise TypeError("Port should be a number")
 
-        # if not isinstance(timeout, six.integer_types):
-        # raise TypeError("Timeout must be a number")
+        o = urlparse(host)
+
+        if not port:
+            port = o.port
 
         self.app_key = app_key
         self.app_secret = app_secret
         self.app_id = app_id
-        self.host = host
+        self.host = o.hostname
         self.port = port
+        self.scheme = o.scheme
         self.timeout = timeout
 
     def trigger(self, channels, event_name, data=None):
@@ -100,7 +104,7 @@ class Asyncnoti(object):
         return json.loads(raw_response)
 
     def _http_request(self, method, uri, request_params):
-        if self.host.find('https') == 0:
+        if self.scheme == 'https':
             if sys.version_info < (3, 4):
                 raise NotImplementedError("SSL requires python >= 3.4")
 
